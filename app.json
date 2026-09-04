@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "mihrab",
+    "name": "Mihrab",
     "slug": "mihrab",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,10 +15,26 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "package": "com.raza11220.mihrab"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "color": "#7C8A50"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "71126e8d-9c49-47a5-9c15-99294ee532cd"
+      }
+    },
+    "owner": "raza11220"
   }
 }
