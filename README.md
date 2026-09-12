@@ -1,6 +1,10 @@
 # Mihrab
 
+![Mihrab logo](assets/icon.png)
+
 > A calm, privacy-first Islamic companion for prayer, Quran reading, Qibla direction and daily reflection.
+
+[![MIT License](https://img.shields.io/badge/license-MIT-7C8A50.svg)](LICENSE) [![Expo SDK 57](https://img.shields.io/badge/Expo-57-4630EB.svg)](https://docs.expo.dev/versions/v57.0.0/) ![Platforms](https://img.shields.io/badge/platforms-Android%20%7C%20iOS%20%7C%20Web-E8A33D.svg)
 
 Mihrab is an Expo and React Native application that brings essential Islamic tools into one focused experience: prayer times, Qibla guidance, Quran reading, recitation, monthly planning, reminders and daily reflection.
 
@@ -201,7 +205,7 @@ Keep feature logic inside the existing ownership boundaries:
 
 ## License
 
-See [LICENSE](LICENSE).
+Mihrab is released under the [MIT License](LICENSE).
 
 ---
 
