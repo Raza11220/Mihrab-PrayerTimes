@@ -26,6 +26,26 @@ const PERSISTED_DEFAULTS = {
   school: 1,
   timeFormat: '12h', // '12h' | '24h'
   hasOnboarded: false,
+  reminders: { Fajr: false, Dhuhr: false, Asr: false, Maghrib: false, Isha: false },
+  reminderLeadMinutes: 0,
+  quranLastRead: { surah: 1, ayah: 1 },
+  quranReciter: 'ar.alafasy',
+  quranBookmarks: [],
+  quranBookmarkFolders: ['Favorites'],
+  quranArabicFontSize: 24,
+  quranTranslationFontSize: 15,
+  quranShowTranslation: true,
+  quranReadingMode: 'translation',
+  darkMode: false,
+  notificationSound: 'default',
+  notificationsEnabled: false,
+  travelMode: false,
+  savedLocations: [],
+  language: 'en',
+  largeText: false,
+  highContrast: false,
+  tasbihCount: 0,
+  tasbihHistory: [],
 
   // The API payload exactly as received. We store the RAW object, never the
   // normalized version — Date objects do not survive JSON, they come back as
@@ -127,6 +147,58 @@ export const useAppStore = create(
       setMethod: (method) => set({ method }),
       setSchool: (school) => set({ school }),
       setTimeFormat: (timeFormat) => set({ timeFormat }),
+      setReminder: (prayer, enabled) =>
+        set((state) => ({ reminders: { ...state.reminders, [prayer]: enabled } })),
+      setReminderLeadMinutes: (reminderLeadMinutes) => set({ reminderLeadMinutes }),
+      setQuranLastRead: (quranLastRead) => set({ quranLastRead }),
+      setQuranReciter: (quranReciter) => set({ quranReciter }),
+      setQuranReadingSettings: (settings) => set(settings),
+      toggleQuranBookmark: ({ surah, ayah, folder = 'Favorites' }) =>
+        set((state) => {
+          const exists = state.quranBookmarks.some(
+            (bookmark) => bookmark.surah === surah && bookmark.ayah === ayah && bookmark.folder === folder
+          );
+          return {
+            quranBookmarks: exists
+              ? state.quranBookmarks.filter(
+                  (bookmark) => !(bookmark.surah === surah && bookmark.ayah === ayah && bookmark.folder === folder)
+                )
+              : [...state.quranBookmarks, { id: `${surah}:${ayah}:${folder}`, surah, ayah, folder, note: '' }],
+          };
+        }),
+      setQuranBookmarkNote: (id, note) =>
+        set((state) => ({
+          quranBookmarks: state.quranBookmarks.map((bookmark) =>
+            bookmark.id === id ? { ...bookmark, note } : bookmark
+          ),
+        })),
+      addQuranBookmarkFolder: (folder) =>
+        set((state) => ({
+          quranBookmarkFolders: state.quranBookmarkFolders.includes(folder)
+            ? state.quranBookmarkFolders
+            : [...state.quranBookmarkFolders, folder],
+        })),
+      saveLocation: (location) =>
+        set((state) => ({
+          savedLocations: state.savedLocations.some((item) => item.city === location.city && item.country === location.country)
+            ? state.savedLocations
+            : [...state.savedLocations, location],
+        })),
+      removeSavedLocation: (city, country) =>
+        set((state) => ({
+          savedLocations: state.savedLocations.filter((item) => item.city !== city || item.country !== country),
+        })),
+      setTravelMode: (travelMode) => set({ travelMode }),
+      setNotificationsEnabled: (notificationsEnabled) => set({ notificationsEnabled }),
+      setNotificationSound: (notificationSound) => set({ notificationSound }),
+      setLanguage: (language) => set({ language }),
+      setAccessibility: (settings) => set(settings),
+      incrementTasbih: () => set((state) => ({ tasbihCount: state.tasbihCount + 1 })),
+      resetTasbih: () =>
+        set((state) => ({
+          tasbihCount: 0,
+          tasbihHistory: [...state.tasbihHistory, { count: state.tasbihCount, date: new Date().toISOString() }].slice(-30),
+        })),
       completeOnboarding: () => set({ hasOnboarded: true }),
 
       // --- Danger zone ------------------------------------------------------
@@ -142,6 +214,26 @@ export const useAppStore = create(
         school: state.school,
         timeFormat: state.timeFormat,
         hasOnboarded: state.hasOnboarded,
+        reminders: state.reminders,
+        reminderLeadMinutes: state.reminderLeadMinutes,
+        quranLastRead: state.quranLastRead,
+        quranReciter: state.quranReciter,
+        quranBookmarks: state.quranBookmarks,
+        quranBookmarkFolders: state.quranBookmarkFolders,
+        quranArabicFontSize: state.quranArabicFontSize,
+        quranTranslationFontSize: state.quranTranslationFontSize,
+        quranShowTranslation: state.quranShowTranslation,
+        quranReadingMode: state.quranReadingMode,
+        darkMode: state.darkMode,
+        notificationSound: state.notificationSound,
+        notificationsEnabled: state.notificationsEnabled,
+        travelMode: state.travelMode,
+        savedLocations: state.savedLocations,
+        language: state.language,
+        largeText: state.largeText,
+        highContrast: state.highContrast,
+        tasbihCount: state.tasbihCount,
+        tasbihHistory: state.tasbihHistory,
         timingsRaw: state.timingsRaw,
         timingsKey: state.timingsKey,
       }),

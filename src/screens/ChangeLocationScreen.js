@@ -34,14 +34,23 @@ export default function ChangeLocationScreen({ navigation }) {
   const setLocationManually = useAppStore((state) => state.setLocationManually);
   const loadDeviceLocation = useAppStore((state) => state.loadDeviceLocation);
   const locationStatus = useAppStore((state) => state.locationStatus);
+  const currentLocation = useAppStore((state) => state.location);
+  const savedLocations = useAppStore((state) => state.savedLocations);
+  const saveLocation = useAppStore((state) => state.saveLocation);
 
   const gpsBusy = locationStatus === 'loading';
 
   const handleSearch = async () => {
     Keyboard.dismiss();
-    setSearching(true);
     setError(null);
     setResult(null);
+
+    if (query.trim().length < 3) {
+      setError('too-short');
+      return;
+    }
+
+    setSearching(true);
 
     const outcome = await searchCity(query);
 
@@ -54,8 +63,15 @@ export default function ChangeLocationScreen({ navigation }) {
     setSearching(false);
   };
 
+  const handleQueryChange = (value) => {
+    setQuery(value);
+    if (error) setError(null);
+    if (result) setResult(null);
+  };
+
   const handleConfirm = () => {
     setLocationManually(result);
+    saveLocation(result);
     navigation.goBack();
   };
 
@@ -67,6 +83,7 @@ export default function ChangeLocationScreen({ navigation }) {
 
     // Only dismiss the modal if we actually got a location.
     if (outcome.ok) {
+      saveLocation(outcome.location);
       navigation.goBack();
     } else {
       setError(outcome.reason);
@@ -91,19 +108,38 @@ export default function ChangeLocationScreen({ navigation }) {
         Search for your city to get prayer times for that position.
       </Text>
 
+      {savedLocations.length > 0 && (
+        <View style={styles.savedSection}>
+          <Text style={styles.savedLabel}>SAVED LOCATIONS</Text>
+          {savedLocations.map((item) => (
+            <Pressable
+              key={`${item.city}-${item.country}`}
+              style={styles.savedRow}
+              onPress={() => { setLocationManually(item); navigation.goBack(); }}
+            >
+              <Ionicons name={currentLocation?.city === item.city ? 'checkmark-circle' : 'location-outline'} size={19} color={colors.primary} />
+              <Text style={styles.savedText}>{[item.city, item.country].filter(Boolean).join(', ')}</Text>
+              <Ionicons name="chevron-forward" size={16} color={colors.textFaint} />
+            </Pressable>
+          ))}
+        </View>
+      )}
+
       <View style={styles.searchRow}>
         <View style={styles.inputWrap}>
           <Ionicons name="search" size={18} color={colors.textFaint} />
           <TextInput
             style={styles.input}
             value={query}
-            onChangeText={setQuery}
+            onChangeText={handleQueryChange}
             placeholder="City name"
             placeholderTextColor={colors.textFaint}
             autoFocus
             autoCorrect={false}
             returnKeyType="search"
             onSubmitEditing={handleSearch}
+            maxLength={80}
+            accessibilityLabel="City name"
           />
           {query.length > 0 && (
             <Pressable onPress={() => setQuery('')} hitSlop={8}>
@@ -139,6 +175,7 @@ export default function ChangeLocationScreen({ navigation }) {
           </View>
 
           <View style={styles.resultText}>
+            <Text style={styles.resultLabel}>FOUND LOCATION</Text>
             <Text style={type.h3} numberOfLines={1}>
               {result.city}
             </Text>
@@ -156,7 +193,7 @@ export default function ChangeLocationScreen({ navigation }) {
           style={({ pressed }) => [styles.primaryButton, pressed && styles.primaryButtonPressed]}
           onPress={handleConfirm}
         >
-          <Text style={type.button}>Use this location</Text>
+          <Text style={type.button}>Use {result.city}</Text>
         </Pressable>
       )}
 
@@ -203,6 +240,10 @@ const styles = StyleSheet.create({
   intro: {
     marginTop: spacing.sm,
   },
+  savedSection: { marginTop: spacing.xl, padding: spacing.md, borderRadius: radius.lg, backgroundColor: colors.card, ...shadow.card },
+  savedLabel: { ...type.label, color: colors.primary, fontSize: 10, marginBottom: spacing.xs },
+  savedRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingVertical: spacing.md, borderTopWidth: 1, borderTopColor: colors.divider },
+  savedText: { ...type.body, flex: 1 },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -275,6 +316,12 @@ const styles = StyleSheet.create({
   },
   resultText: {
     flex: 1,
+  },
+  resultLabel: {
+    ...type.label,
+    color: colors.primary,
+    fontSize: 10,
+    marginBottom: 2,
   },
   primaryButton: {
     marginTop: spacing.lg,

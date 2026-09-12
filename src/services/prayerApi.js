@@ -67,3 +67,16 @@ export async function fetchDayTimings({ latitude, longitude, method, school, dat
 
   return { ok: true, data: result.json.data };
 }
+
+export async function fetchMonthTimings({ latitude, longitude, method, school, month, year }) {
+  const query = toQuery({ latitude, longitude, method, school });
+  const url = `${BASE_URL}/calendar/${year}/${month}?${query}`;
+  const result = await getJson(url);
+
+  if (!result.ok) return result;
+  if (result.json?.code !== 200 || !Array.isArray(result.json?.data)) {
+    return { ok: false, reason: 'bad-payload' };
+  }
+
+  return { ok: true, data: result.json.data };
+}

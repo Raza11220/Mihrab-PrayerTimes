@@ -7,6 +7,9 @@ import TimesScreen from '../screens/TimesScreen';
 import QiblaScreen from '../screens/QiblaScreen';
 import RemindersScreen from '../screens/RemindersScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import CalendarScreen from '../screens/CalendarScreen';
+import ToolsScreen from '../screens/ToolsScreen';
+import QuranNavigator from './QuranNavigator';
 import { colors, radius, spacing, shadow, layout } from '../theme/colors';
 
 const Tab = createBottomTabNavigator();
@@ -15,6 +18,9 @@ const Tab = createBottomTabNavigator();
 // so the active tab reads as solid and heavier — a subtle but important cue.
 const ICONS = {
   Times: 'moon',
+  Quran: 'book',
+  Calendar: 'calendar',
+  Tools: 'sparkles',
   Qibla: 'compass',
   Reminders: 'notifications',
   Settings: 'grid',
@@ -48,6 +54,9 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="Times" component={TimesScreen} />
+      <Tab.Screen name="Quran" component={QuranNavigator} />
+      <Tab.Screen name="Calendar" component={CalendarScreen} />
+      <Tab.Screen name="Tools" component={ToolsScreen} />
       <Tab.Screen name="Qibla" component={QiblaScreen} />
       <Tab.Screen name="Reminders" component={RemindersScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />

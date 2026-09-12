@@ -1,18 +1,20 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import ScreenContainer from '../../components/ScreenContainer';
-import MosqueIllustration from '../../components/MosqueIllustration';
-import { colors, radius, spacing, shadow } from '../../theme/colors';
-import { type, fonts } from '../../theme/typography';
+import ScreenContainer from '../components/ScreenContainer';
+import BrandMark from '../components/BrandMark';
+import MosqueIllustration from '../components/MosqueIllustration';
+import { colors, radius, spacing, shadow } from '../theme/colors';
+import { type, fonts } from '../theme/typography';
+import { useAppStore } from '../store/useAppStore';
 
 export default function WelcomeScreen({ navigation }) {
+  const completeOnboarding = useAppStore((state) => state.completeOnboarding);
+
   return (
     <ScreenContainer style={styles.screen}>
       <View style={styles.brandRow}>
-        <View style={styles.brandMark}>
-          <Ionicons name="moon" size={16} color={colors.textOnPrimary} />
-        </View>
+        <BrandMark size={34} />
         <Text style={styles.brandName}>Mihrab</Text>
       </View>
 
@@ -30,7 +32,10 @@ export default function WelcomeScreen({ navigation }) {
 
       <Pressable
         style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
-        onPress={() => navigation.replace('Main')}
+        onPress={() => {
+          completeOnboarding();
+          navigation.replace('Main');
+        }}
       >
         <Text style={type.button}>Get Started</Text>
       </Pressable>
@@ -49,14 +54,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     gap: spacing.sm,
     marginTop: spacing.sm,
-  },
-  brandMark: {
-    width: 28,
-    height: 28,
-    borderRadius: radius.sm,
-    backgroundColor: colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   brandName: {
     fontFamily: fonts.semibold,

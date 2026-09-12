@@ -1,5 +1,5 @@
 // The Kaaba, Masjid al-Haram, Makkah.
-const KAABA = { latitude: 21.4225, longitude: 39.8262 };
+export const KAABA = { latitude: 21.4225, longitude: 39.8262 };
 
 const EARTH_RADIUS_KM = 6371;
 

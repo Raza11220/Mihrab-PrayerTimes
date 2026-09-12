@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { useEffect, useRef } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import {
@@ -12,14 +13,33 @@ import {
 
 import RootNavigator from './src/navigation/RootNavigator';
 import { colors } from './src/theme/colors';
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 export default function App() {
+  const navigationRef = useRef(null);
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_600SemiBold,
     Poppins_700Bold,
   });
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      const prayer = response.notification.request.content.data?.prayer;
+      if (prayer) navigationRef.current?.navigate('Main', { screen: 'Times' });
+    });
+    return () => subscription.remove();
+  }, []);
 
   if (!fontsLoaded) {
     return (
@@ -32,7 +52,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <RootNavigator />
       </NavigationContainer>
     </SafeAreaProvider>

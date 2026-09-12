@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, radius, spacing, shadow } from '../../theme/colors';
-import { type } from '../../theme/typography';
+import { colors, radius, spacing, shadow } from '../theme/colors';
+import { type } from '../theme/typography';
 
 const SWATCHES = [
   { name: 'primary', value: colors.primary },
