@@ -15,6 +15,7 @@ import RootNavigator from './src/navigation/RootNavigator';
 import BrandMark from './src/components/BrandMark';
 import { colors } from './src/theme/colors';
 import * as Notifications from 'expo-notifications';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -35,11 +36,19 @@ export default function App() {
   });
 
   useEffect(() => {
-    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-      const prayer = response.notification.request.content.data?.prayer;
-      if (prayer) navigationRef.current?.navigate('Main', { screen: 'Times' });
-    });
-    return () => subscription.remove();
+    if (Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {
+      return undefined;
+    }
+
+    try {
+      const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+        const prayer = response.notification.request.content.data?.prayer;
+        if (prayer) navigationRef.current?.navigate('Main', { screen: 'Times' });
+      });
+      return () => subscription.remove();
+    } catch (error) {
+      return undefined;
+    }
   }, []);
 
   if (!fontsLoaded) {

@@ -6,34 +6,42 @@ import { normalizeTimings, PRAYERS } from '../utils/prayers';
 const CHANNEL_ID = 'prayer-reminders';
 
 export async function prepareNotifications() {
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-      name: 'Prayer reminders',
-      description: 'Reminders for the five daily prayers',
-      importance: Notifications.AndroidImportance.HIGH,
-      sound: 'default',
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#7C8A50',
+  try {
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
+        name: 'Prayer reminders',
+        description: 'Reminders for the five daily prayers',
+        importance: Notifications.AndroidImportance.HIGH,
+        sound: 'default',
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#7C8A50',
+      });
+    }
+
+    const current = await Notifications.getPermissionsAsync();
+    if (current.granted || current.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL) {
+      return { ok: true };
+    }
+
+    const requested = await Notifications.requestPermissionsAsync({
+      ios: { allowAlert: true, allowBadge: true, allowSound: true },
     });
+
+    return { ok: requested.granted || requested.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL };
+  } catch (error) {
+    return { ok: false, reason: 'unsupported-runtime' };
   }
-
-  const current = await Notifications.getPermissionsAsync();
-  if (current.granted || current.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL) {
-    return { ok: true };
-  }
-
-  const requested = await Notifications.requestPermissionsAsync({
-    ios: { allowAlert: true, allowBadge: true, allowSound: true },
-  });
-
-  return { ok: requested.granted || requested.ios?.status === Notifications.IosAuthorizationStatus.PROVISIONAL };
 }
 
 export async function schedulePrayerReminders({ timingsRaw, reminders, leadMinutes = 0 }) {
   const permission = await prepareNotifications();
   if (!permission.ok) return { ok: false, reason: 'permission-denied' };
 
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  try {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+  } catch (error) {
+    return { ok: false, reason: 'unsupported-runtime' };
+  }
 
   const entries = normalizeTimings(timingsRaw).filter((entry) =>
     PRAYERS.some((prayer) => prayer.key === entry.key && prayer.isFard && reminders[entry.key])
@@ -46,7 +54,9 @@ export async function schedulePrayerReminders({ timingsRaw, reminders, leadMinut
     const triggerDate = new Date(entry.date.getTime() - leadMinutes * 60 * 1000);
     if (triggerDate.getTime() <= now) continue;
 
-    const identifier = await Notifications.scheduleNotificationAsync({
+    let identifier;
+    try {
+      identifier = await Notifications.scheduleNotificationAsync({
       content: {
         title: `${entry.label} prayer`,
         body: leadMinutes
@@ -61,7 +71,10 @@ export async function schedulePrayerReminders({ timingsRaw, reminders, leadMinut
         date: triggerDate,
         ...(Platform.OS === 'android' ? { channelId: CHANNEL_ID } : {}),
       },
-    });
+      });
+    } catch (error) {
+      return { ok: false, reason: 'unsupported-runtime' };
+    }
 
     scheduled.push(identifier);
   }
