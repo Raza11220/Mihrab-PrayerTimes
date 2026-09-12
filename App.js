@@ -12,6 +12,7 @@ import {
 } from '@expo-google-fonts/poppins';
 
 import RootNavigator from './src/navigation/RootNavigator';
+import BrandMark from './src/components/BrandMark';
 import { colors } from './src/theme/colors';
 import * as Notifications from 'expo-notifications';
 
@@ -44,7 +45,8 @@ export default function App() {
   if (!fontsLoaded) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <BrandMark size={82} />
+        <ActivityIndicator size="small" color={colors.primary} style={styles.loaderIndicator} />
       </View>
     );
   }
@@ -65,5 +67,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.background,
+  },
+  loaderIndicator: {
+    marginTop: 16,
   },
 });

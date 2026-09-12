@@ -12,7 +12,11 @@
       "backgroundColor": "#FAF7F0"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.raza11220.mihrab",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +25,12 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "com.raza11220.mihrab"
+      "package": "com.raza11220.mihrab",
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
     },
     "web": {
       "favicon": "./assets/icon.png"
@@ -49,6 +58,12 @@
         "projectId": "71126e8d-9c49-47a5-9c15-99294ee532cd"
       }
     },
-    "owner": "raza11220"
+    "owner": "raza11220",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/71126e8d-9c49-47a5-9c15-99294ee532cd"
+    }
   }
 }

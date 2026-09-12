@@ -1,6 +1,8 @@
 # Mihrab
 
-![Mihrab logo](assets/icon.png)
+<!-- markdownlint-disable MD033 -->
+<img src="assets/icon.png" alt="Mihrab logo" width="72" />
+<!-- markdownlint-enable MD033 -->
 
 > A calm, privacy-first Islamic companion for prayer, Quran reading, Qibla direction and daily reflection.
 
