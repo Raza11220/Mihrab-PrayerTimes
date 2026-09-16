@@ -3,6 +3,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import TabNavigator from './TabNavigator';
 import ChangeLocationScreen from '../screens/ChangeLocationScreen';
+import BackupScreen from '../screens/BackupScreen';
+import AboutScreen from '../screens/AboutScreen';
 import { useAppStore } from '../store/useAppStore';
 
 const Stack = createNativeStackNavigator();
@@ -21,6 +23,16 @@ export default function RootNavigator() {
       <Stack.Screen
         name="ChangeLocation"
         component={ChangeLocationScreen}
+        options={{ presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="Backup"
+        component={BackupScreen}
+        options={{ presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="About"
+        component={AboutScreen}
         options={{ presentation: 'modal' }}
       />
     </Stack.Navigator>

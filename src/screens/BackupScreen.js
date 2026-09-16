@@ -7,41 +7,40 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
+  Share,
+  Clipboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
 
 import ScreenContainer from '../components/ScreenContainer';
 import { useAppStore } from '../store/useAppStore';
-import { colors, radius, spacing, shadow } from '../theme/colors';
+import { colors, radius, spacing, shadow, layout } from '../theme/colors';
 import { type } from '../theme/typography';
 
 export default function BackupScreen() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState(null);
-  const allKeys = useAppStore((state) => Object.keys(state).length > 0);
 
   const exportBackup = async () => {
     setBusy(true);
     setMessage(null);
     try {
-      const allEntries = await AsyncStorage.getAllKeys();
-      const entries = await AsyncStorage.multiGet(allEntries);
+      const allKeys = await AsyncStorage.getAllKeys();
+      const entries = await AsyncStorage.multiGet(allKeys);
       const data = Object.fromEntries(entries.map(([k, v]) => [k, v]));
       const json = JSON.stringify({ version: 1, timestamp: Date.now(), data }, null, 2);
-      const fileUri = `${FileSystem.documentDirectory}mihrab-backup-${Date.now()}.json`;
-      await FileSystem.writeAsStringAsync(fileUri, json, { encoding: FileSystem.EncodingType.UTF8 });
 
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(fileUri, {
-          mimeType: 'application/json',
-          dialogTitle: 'Share Mihrab Backup',
-        });
-      } else {
-        setMessage(`Backup saved to: ${fileUri}`);
+      const result = await Share.share({
+        message: json,
+        title: 'Mihrab Backup',
+        dialogTitle: 'Share Mihrab Backup',
+      });
+
+      if (result.dismissedAction) {
+        await Clipboard.setString(json);
+        setMessage('Backup copied to clipboard (share dismissed).');
       }
     } catch (error) {
       setMessage('Backup failed. Check your storage and try again.');
@@ -54,26 +53,17 @@ export default function BackupScreen() {
     setBusy(true);
     setMessage(null);
     try {
-      if (!(await Sharing.isAvailableAsync())) {
-        setMessage('Import is only available on devices with a file manager.');
+      const text = await Clipboard.getString();
+      if (!text) {
+        setMessage('Paste your backup JSON first, then try again.');
         setBusy(false);
         return;
       }
 
-      const result = await Sharing.getSharedDataAsync();
-      if (!result || !result.uri) {
-        setMessage('No backup file selected.');
-        setBusy(false);
-        return;
-      }
-
-      const content = await FileSystem.readAsStringAsync(result.uri, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
-      const backup = JSON.parse(content);
+      const backup = JSON.parse(text);
 
       if (!backup || !backup.data || typeof backup.data !== 'object') {
-        setMessage('Invalid backup file.');
+        setMessage('Invalid backup format. Please paste a valid Mihrab backup.');
         setBusy(false);
         return;
       }
@@ -81,11 +71,11 @@ export default function BackupScreen() {
       const entries = Object.entries(backup.data);
       await AsyncStorage.multiSet(entries);
 
-      Alert.alert('Restore complete', 'Your data has been restored. The app will restart for changes to take effect.', [
+      Alert.alert('Restore complete', 'Your data has been restored.', [
         { text: 'OK', onPress: () => {} },
       ]);
     } catch (error) {
-      setMessage('Import failed. The file may be corrupted or in the wrong format.');
+      setMessage('Import failed. Paste a valid JSON backup and try again.');
     } finally {
       setBusy(false);
     }

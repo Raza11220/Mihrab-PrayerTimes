@@ -29,7 +29,7 @@ Mihrab is an Expo and React Native application that brings essential Islamic too
 - Mushaf-only and translation reading modes
 - Arabic, Urdu and English Quran search
 - Direct navigation from search result to Ayah
-- Ayah bookmarks and persisted reading progress
+- Ayah bookmarks with folder management and personal notes
 - Arabic and translation font size controls
 - Screen-reader labels and RTL-friendly Urdu/Arabic rendering
 - Multiple reciters: Mishary Alafasy, Abdul Basit, Abdul Samad and Saad Al-Ghamdi
@@ -62,6 +62,12 @@ Mihrab is an Expo and React Native application that brings essential Islamic too
 - Persistent Tasbih counter and session history
 - Ramadan mode foundation
 
+### 📦 Backup & Restore
+
+- Export all app data (locations, settings, bookmarks) as JSON
+- Import from shared JSON backup
+- Reset all data with confirmation
+
 ### 📍 Location and Reminders
 
 - GPS location support and manual city search
@@ -82,6 +88,45 @@ Mihrab is an Expo and React Native application that brings essential Islamic too
 - Local-first settings, bookmarks and reading progress
 - No analytics or advertising trackers configured
 - Clear privacy and permissions explanation in Settings
+- Global error boundary catches all crashes gracefully
+
+## 🧭 Navigation
+
+```
+RootNavigator (Stack)
+├── Welcome (onboarding, dismissed after first launch)
+├── Main (TabNavigator)
+│   ├── Times       Prayer times + countdown
+│   ├── Quran       Surah directory + reader + search + bookmarks
+│   ├── Calendar    Monthly prayer calendar
+│   ├── Tools       Ayah, Hadith, Dua, Tasbih, Ramadan
+│   ├── Qibla       Compass + direction + route
+│   ├── Reminders   Prayer notification settings
+│   └── Settings    All preferences
+├── ChangeLocation (modal)
+├── Backup      (modal)
+└── About       (modal)
+```
+
+### Screens
+
+| Screen | Purpose |
+|--------|---------|
+| Welcome | First-time onboarding |
+| Times | Prayer times with live countdown |
+| Quran | Surah browser, search, continue reading |
+| QuranReader | Arabic + translations, bookmarks, audio |
+| QuranSearch | Search by edition (EN/UR/AR) |
+| JuzDirectory | 30 Siparah browser |
+| Bookmarks | Folder management + Ayah notes |
+| Qibla | Compass, bearing, distance, route |
+| Calendar | Monthly prayer + Hijri calendar |
+| Tools | Ayah, Hadith, Dua, Tasbih, Ramadan |
+| Reminders | Per-prayer notifications + lead time |
+| Settings | All preferences + backup + about |
+| ChangeLocation | GPS or city search |
+| Backup | Export/import/reset data |
+| About | Version, license, credits |
 
 ## 🛠️ Tech Stack
 
@@ -135,12 +180,15 @@ The web target is useful for UI testing. Physical compass, native GPS permission
 .
 ├── App.js
 ├── app.json
+├── jest.config.js
 ├── assets/
+├── tests/
+│   └── utils.test.js
 └── src/
-    ├── components/       Reusable UI components
+    ├── components/       Reusable UI components (ErrorBoundary added)
     ├── hooks/            Location, heading and clock hooks
-    ├── navigation/       Root, tab and Quran navigation
-    ├── screens/          App screens and feature workspaces
+    ├── navigation/       Root, tab and Quran navigation (Backup, About routed here)
+    ├── screens/          App screens and feature workspaces (Bookmarks, Backup, About added)
     ├── services/         Prayer, Quran, location and notification APIs
     ├── store/            Persisted Zustand application state
     ├── theme/            Colors, spacing, shadows and typography
@@ -183,15 +231,20 @@ External services are used for live data when required. Review their terms and r
 
 ## 🗺️ Roadmap
 
-- Complete app-wide localization
-- Add bookmark folders and personal notes UI
+- Complete app-wide localization (English, Urdu, Arabic, Roman Urdu UI)
 - Add offline Quran and audio download manager
 - Add custom licensed Azan audio options
 - Add full Ramadan calendar, Sehri and Iftar countdowns
 - Add optional authentication and encrypted cloud sync
-- Add device backup/export and restore
-- Add automated tests for prayer, Qibla and persisted settings
 - Prepare Android and iOS production builds
+
+## 🧪 Testing
+
+```bash
+npm test
+```
+
+Unit tests cover prayer calculations, Qibla math, time formatting, and Quran utilities.
 
 ## 🧑‍💻 Development Notes
 
@@ -204,6 +257,7 @@ Keep feature logic inside the existing ownership boundaries:
 - Persisted state belongs in `src/store`
 - Calculations and pure helpers belong in `src/utils`
 - Shared visual tokens belong in `src/theme`
+- Error handling is wrapped in `src/components/ErrorBoundary`
 
 ## License
 

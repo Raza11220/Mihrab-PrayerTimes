@@ -142,6 +142,10 @@ export default function SettingsScreen({ navigation }) {
         <Text style={styles.sectionLabel}>APP</Text>
         <View style={styles.card}>
           <SettingRow icon="refresh-outline" label="Reset app data" danger onPress={confirmReset} />
+          <View style={styles.divider} />
+          <SettingRow icon="cloud-outline" label="Backup & Restore" value="Export or import data" onPress={() => navigation.navigate('Backup')} />
+          <View style={styles.divider} />
+          <SettingRow icon="information-circle-outline" label="About" value="Version, license, and credits" onPress={() => navigation.navigate('About')} />
         </View>
 
         <Text style={[type.caption, styles.hint]}>Tap a setting to cycle through its available options.</Text>

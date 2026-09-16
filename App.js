@@ -13,6 +13,7 @@ import {
 
 import RootNavigator from './src/navigation/RootNavigator';
 import BrandMark from './src/components/BrandMark';
+import ErrorBoundary from './src/components/ErrorBoundary';
 import { colors } from './src/theme/colors';
 import * as Notifications from 'expo-notifications';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
@@ -64,7 +65,9 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar style="dark" />
       <NavigationContainer ref={navigationRef}>
-        <RootNavigator />
+        <ErrorBoundary>
+          <RootNavigator />
+        </ErrorBoundary>
       </NavigationContainer>
     </SafeAreaProvider>
   );

@@ -62,8 +62,13 @@ export default function QuranScreen({ navigation }) {
             <Text style={type.label}>READ AND REFLECT</Text>
             <Text style={type.h1}>The Quran</Text>
           </View>
-          <View style={styles.headerIcon}>
-            <Ionicons name="book-outline" size={22} color={colors.primary} />
+          <View style={styles.headerActions}>
+            <Pressable onPress={() => navigation.navigate('Bookmarks')} hitSlop={8} style={styles.headerIcon}>
+              <Ionicons name="bookmarks-outline" size={20} color={colors.primary} />
+            </Pressable>
+            <View style={styles.headerIcon}>
+              <Ionicons name="book-outline" size={22} color={colors.primary} />
+            </View>
           </View>
         </View>
 
@@ -151,6 +156,7 @@ export default function QuranScreen({ navigation }) {
 const styles = StyleSheet.create({
   content: { paddingHorizontal: spacing.xl, paddingBottom: layout.tabBarSpace },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   headerIcon: { width: 44, height: 44, borderRadius: radius.md, backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
   hero: { flexDirection: 'row', alignItems: 'center', marginTop: spacing.xl, padding: spacing.lg, borderRadius: radius.lg, backgroundColor: colors.primary, ...shadow.raised },
   heroMark: { width: 42, height: 42, borderRadius: radius.md, backgroundColor: colors.primaryDark, alignItems: 'center', justifyContent: 'center' },
